@@ -1,8 +1,10 @@
 package it.unibo.oop.lab.collections2;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-
+import java.util.Map;
 /**
  * 
  * Instructions
@@ -13,70 +15,104 @@ import java.util.List;
  * 1) complete the definition of the methods by following the suggestions
  * included in the comments below.
  * 
- * @param <U>
- *            Specific user type
+ * @param <U> Specific user type
  */
 public class SocialNetworkUserImpl<U extends User> extends UserImpl implements SocialNetworkUser<U> {
 
-    /*
-     * 
-     * [FIELDS]
-     * 
-     * Define any necessary field
-     * 
-     * In order to save the people followed by a user organized in groups, adopt
-     * a generic-type Map:
-     * 
-     * think of what type of keys and values would best suit the requirements
-     */
+	/*
+	 * 
+	 * [FIELDS]
+	 * 
+	 * Define any necessary field
+	 * 
+	 * In order to save the people followed by a user organized in groups, adopt a
+	 * generic-type Map:
+	 * 
+	 * think of what type of keys and values would best suit the requirements
+	 */
 
-    /*
-     * [CONSTRUCTORS]
-     * 
-     * 1) Complete the definition of the constructor below, for building a user
-     * participating in a social network, with 4 parameters, initializing:
-     * 
-     * - firstName - lastName - username - age and every other necessary field
-     * 
-     * 2) Define a further constructor where age is defaulted to -1
-     */
+	private final Map<String, LinkedList<U>> map;
 
-    /**
-     * Builds a new {@link SocialNetworkUserImpl}.
-     * 
-     * @param name
-     *            the user firstname
-     * @param surname
-     *            the user lastname
-     * @param userAge
-     *            user's age
-     * @param user
-     *            alias of the user, i.e. the way a user is identified on an
-     *            application
-     */
-    public SocialNetworkUserImpl(final String name, final String surname, final String user, final int userAge) {
-        super(name, surname, user, userAge);
-    }
+	/*
+	 * [CONSTRUCTORS]
+	 * 
+	 * 1) Complete the definition of the constructor below, for building a user
+	 * participating in a social network, with 4 parameters, initializing:
+	 * 
+	 * - firstName - lastName - username - age and every other necessary field
+	 * 
+	 * 2) Define a further constructor where age is defaulted to -1
+	 */
 
-    /*
-     * [METHODS]
-     * 
-     * Implements the methods below
-     */
+	/**
+	 * Builds a new {@link SocialNetworkUserImpl}.
+	 * 
+	 * @param name    the user firstname
+	 * @param surname the user lastname
+	 * @param userAge user's age
+	 * @param user    alias of the user, i.e. the way a user is identified on an
+	 *                application
+	 */
+	public SocialNetworkUserImpl(final String name, final String surname, final String user, final int userAge) {
+		super(name, surname, user, userAge);
+		this.map = new HashMap<>();
+	}
 
-    @Override
-    public boolean addFollowedUser(final String circle, final U user) {
-        return false;
-    }
+	public SocialNetworkUserImpl(final String name, final String surname, final String user) {
+		super(name, surname, user);
+		this.map = new HashMap<>();
+	}
 
-    @Override
-    public Collection<U> getFollowedUsersInGroup(final String groupName) {
-        return null;
-    }
+	/*
+	 * [METHODS]
+	 * 
+	 * Implements the methods below
+	 */
 
-    @Override
-    public List<U> getFollowedUsers() {
-        return null;
-    }
+	@Override
+	public boolean addFollowedUser(final String circle, final U user) {
+		if (!isIncluded(user)) {
+			if (isGroupExisting(circle)) {
+				this.map.get(circle).add(user);
+				return true;
+			} else {
+				this.map.put(circle, new LinkedList<U>());
+				this.map.get(circle).add(user);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isGroupExisting(String circle) {
+		return this.map.containsKey(circle);
+	}
+
+	private boolean isIncluded(U user) {
+		boolean check = false;
+		for (List<U> list : map.values()) {
+			if (list.contains(user)) {
+				check = true;
+			}
+		}
+		return check;
+	}
+
+	@Override
+	public Collection<U> getFollowedUsersInGroup(final String groupName) {
+		if (this.map.containsKey(groupName)) {
+			return new LinkedList<U>(this.map.get(groupName));
+		}
+		return new LinkedList<U>();
+	}
+
+	@Override
+	public List<U> getFollowedUsers() {
+		List<U> listUsers = new LinkedList<>();
+		for (List<U> list : map.values()) {
+			listUsers.addAll(list);
+		}
+		return listUsers;
+	}
 
 }
