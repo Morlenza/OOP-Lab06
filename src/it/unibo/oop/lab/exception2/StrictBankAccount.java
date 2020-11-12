@@ -1,5 +1,7 @@
 package it.unibo.oop.lab.exception2;
 
+import it.unibo.oop.lab.exception1.NotEnoughBatteryExceptions;
+
 /**
  * Class modeling a BankAccount with strict policies: getting money is allowed
  * only with enough founds, and there are also a limited number of free ATM
@@ -8,110 +10,122 @@ package it.unibo.oop.lab.exception2;
  */
 public class StrictBankAccount implements BankAccount {
 
-    private final int usrID;
-    private double balance;
-    private int totalTransactionCount;
-    private final int maximumAllowedATMTransactions;
-    private static final double ATM_TRANSACTION_FEE = 1;
-    private static final double MANAGEMENT_FEE = 5;
-    private static final double TRANSACTION_FEE = 0.1;
+	private final int usrID;
+	private double balance;
+	private int totalTransactionCount;
+	private final int maximumAllowedATMTransactions;
+	private static final double ATM_TRANSACTION_FEE = 1;
+	private static final double MANAGEMENT_FEE = 5;
+	private static final double TRANSACTION_FEE = 0.1;
 
-    /**
-     * 
-     * @param usrID
-     *            user id
-     * @param balance
-     *            initial balance
-     * @param maximumAllowedAtmTransactions
-     *            max no of ATM transactions allowed
-     */
-    public StrictBankAccount(final int usrID, final double balance, final int maximumAllowedAtmTransactions) {
-        this.usrID = usrID;
-        this.balance = balance;
-        this.maximumAllowedATMTransactions = maximumAllowedAtmTransactions;
-    }
+	/**
+	 * 
+	 * @param usrID                         user id
+	 * @param balance                       initial balance
+	 * @param maximumAllowedAtmTransactions max no of ATM transactions allowed
+	 */
+	public StrictBankAccount(final int usrID, final double balance, final int maximumAllowedAtmTransactions) {
+		this.usrID = usrID;
+		this.balance = balance;
+		this.maximumAllowedATMTransactions = maximumAllowedAtmTransactions;
+	}
 
-    /**
-     * 
-     * {@inheritDoc}
-     */
-    public void deposit(final int usrID, final double amount) {
-        if (checkUser(usrID)) {
-            this.balance += amount;
-            increaseTransactionsCount();
-        }
-    }
+	/**
+	 * 
+	 * {@inheritDoc}
+	 */
+	public void deposit(final int usrID, final double amount) {
+		if (!checkUser(usrID)) {
+			throw new WrongAccountHolderException(usrID);
+		} else {
+			this.balance += amount;
+			increaseTransactionsCount();
+		}
+	}
 
-    /**
-     * 
-     * {@inheritDoc}
-     */
-    public void withdraw(final int usrID, final double amount) {
-        if (checkUser(usrID) && isWithdrawAllowed(amount)) {
-            this.balance -= amount;
-            increaseTransactionsCount();
-        }
-    }
+	/**
+	 * 
+	 * {@inheritDoc}
+	 */
+	public void withdraw(final int usrID, final double amount) {
+		if (!checkUser(usrID)) {
+			throw new WrongAccountHolderException(usrID);
+		} else if (!isWithdrawAllowed(amount)) {
+			throw new NotEnoughFoundsException();
+		} else {
+			this.balance -= amount;
+			increaseTransactionsCount();
+		}
+	}
 
-    /**
-     * 
-     * {@inheritDoc}
-     */
-    public void depositFromATM(final int usrID, final double amount) {
-        if (totalTransactionCount < maximumAllowedATMTransactions) {
-            this.deposit(usrID, amount - StrictBankAccount.ATM_TRANSACTION_FEE);
-            increaseTransactionsCount();
-        }
-    }
+	/**
+	 * 
+	 * {@inheritDoc}
+	 */
+	public void depositFromATM(final int usrID, final double amount) {
+		if (totalTransactionCount < maximumAllowedATMTransactions) {
+			this.deposit(usrID, amount - StrictBankAccount.ATM_TRANSACTION_FEE);
+		}
+		else {
+				throw new TransactionOverQuotaException();
+		}
+	}
+	
 
-    /**
-     * 
-     * {@inheritDoc}
-     */
-    public void withdrawFromATM(final int usrID, final double amount) {
-        if (totalTransactionCount < maximumAllowedATMTransactions) {
-            this.withdraw(usrID, amount + StrictBankAccount.ATM_TRANSACTION_FEE);
-        }
-    }
+	/**
+	 * 
+	 * {@inheritDoc}
+	 */
+	public void withdrawFromATM(final int usrID, final double amount) {
+		if (totalTransactionCount < maximumAllowedATMTransactions) {
+			this.withdraw(usrID, amount + StrictBankAccount.ATM_TRANSACTION_FEE);
+		}
+		else {
+			throw new TransactionOverQuotaException();
+		}	
+	}
 
-    /**
-     * 
-     * {@inheritDoc}
-     */
-    public double getBalance() {
-        return this.balance;
-    }
+	/**
+	 * 
+	 * {@inheritDoc}
+	 */
+	public double getBalance() {
+		return this.balance;
+	}
 
-    /**
-     * 
-     * {@inheritDoc}
-     */
-    public int getTransactionCount() {
-        return totalTransactionCount;
-    }
+	/**
+	 * 
+	 * {@inheritDoc}
+	 */
+	public int getTransactionCount() {
+		return totalTransactionCount;
+	}
 
-    /**
-     * 
-     * @param usrID
-     *            id of the user related to these fees
-     */
-    public void computeManagementFees(final int usrID) {
-        final double feeAmount = MANAGEMENT_FEE + (totalTransactionCount * StrictBankAccount.TRANSACTION_FEE);
-        if (checkUser(usrID) && isWithdrawAllowed(feeAmount)) {
-            balance -= MANAGEMENT_FEE + totalTransactionCount * StrictBankAccount.TRANSACTION_FEE;
-            totalTransactionCount = 0;
-        }
-    }
+	/**
+	 * 
+	 * @param usrID id of the user related to these fees
+	 */
+	public void computeManagementFees(final int usrID) {
+		final double feeAmount = MANAGEMENT_FEE + (totalTransactionCount * StrictBankAccount.TRANSACTION_FEE);
+		if (!checkUser(usrID)) {
+			throw new WrongAccountHolderException(usrID);
+		} else if (!isWithdrawAllowed(feeAmount)) {
+			throw new NotEnoughBatteryExceptions(feeAmount);
+		} else {
+			balance -= MANAGEMENT_FEE + totalTransactionCount * StrictBankAccount.TRANSACTION_FEE;
+			totalTransactionCount = 0;
+		}
+	}
 
-    private boolean checkUser(final int id) {
-        return this.usrID == id;
-    }
+	private boolean checkUser(final int id) {
+		return this.usrID == id;
+	}
 
-    private boolean isWithdrawAllowed(final double amount) {
-        return balance > amount;
-    }
+	private boolean isWithdrawAllowed(final double amount) {
+		return balance > amount;
+	}
 
-    private void increaseTransactionsCount() {
-        totalTransactionCount++;
-    }
+	private void increaseTransactionsCount() {
+		totalTransactionCount++;
+	}
 }
