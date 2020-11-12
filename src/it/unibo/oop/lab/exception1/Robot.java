@@ -21,7 +21,6 @@ public class Robot {
      *            name of the robot
      * @param batteryLevel
      *            initial battery level
-     * @throws Exception
      */
     public Robot(final String robotName, final double batteryLevel) {
         this.batteryLevel = batteryLevel;
@@ -32,38 +31,52 @@ public class Robot {
     /**
      * Moves the robot up by one unit.
      * 
-     * @return If the Up movement has been performed
+     * @throws PositionOutOfBoundException
+     * 				if the robot goes out of boundaries
+     * @throws NotEnoughBatteryExceptions
+     * 				if the battery is not enough for the movement
+     * 
      */
-    public boolean moveUp() {
-        return moveToPosition(environment.getCurrPosX(), this.environment.getCurrPosY() + Robot.MOVEMENT_DELTA);
+    public void moveUp() {
+        this.moveToPosition(environment.getCurrPosX(), this.environment.getCurrPosY() + Robot.MOVEMENT_DELTA);
     }
 
     /**
      * Moves the robot down by one unit.
      * 
-     * @return If the Down movement has been performed
+     * @throws PositionOutOfBoundException
+     * 				if the robot goes out of boundaries
+     * @throws NotEnoughBatteryExceptions
+     * 				if the battery is not enough for the movement
+     * 
      */
-    public boolean moveDown() {
-        return this.moveToPosition(this.environment.getCurrPosX(), environment.getCurrPosY() - Robot.MOVEMENT_DELTA);
+    public void moveDown() {
+        this.moveToPosition(this.environment.getCurrPosX(), environment.getCurrPosY() - Robot.MOVEMENT_DELTA);
     }
 
     /**
      * Moves the robot left by one unit.
      * 
-     * @return A boolean indicating if the Left movement has been performed
+     * @throws PositionOutOfBoundException
+     * 				if the robot goes out of boundaries
+     * @throws NotEnoughBatteryExceptions
+     * 				if the battery is not enough for the movement
      */
-    public boolean moveLeft() {
-        return this.moveToPosition(this.environment.getCurrPosX() - Robot.MOVEMENT_DELTA,
+    public void moveLeft() {
+        this.moveToPosition(this.environment.getCurrPosX() - Robot.MOVEMENT_DELTA,
                 this.environment.getCurrPosY());
     }
 
     /**
      * Moves the robot right by one unit.
      * 
-     * @return A boolean indicating if the Right movement has been performed
+     * @throws PositionOutOfBoundException
+     * 				if the robot goes out of boundaries
+     * @throws NotEnoughBatteryExceptions
+     * 				if the battery is not enough for the movement
      */
-    public boolean moveRight() {
-        return this.moveToPosition(this.environment.getCurrPosX() + Robot.MOVEMENT_DELTA,
+    public void moveRight() {
+        this.moveToPosition(this.environment.getCurrPosX() + Robot.MOVEMENT_DELTA,
                 this.environment.getCurrPosY());
     }
 
@@ -81,24 +94,17 @@ public class Robot {
      *            the new X position to move the robot to
      * @param newY
      *            the new Y position to move the robot to
-     * @return true if robot gets moved, false otherwise
+     * @throws NotEnoughBatteryExceptions
      */
-    private boolean moveToPosition(final int newX, final int newY) {
-        boolean returnValue = true;
+    private void moveToPosition(final int newX, final int newY) {
         if (this.isBatteryEnoughToMove()) {
-            if (this.environment.move(newX, newY)) {
+        	this.environment.move(newX, newY);
                 this.consumeBatteryForMovement();
                 this.log("Moved to position(" + newX + "," + newY + ").");
-            } else {
-                this.log("Can not move to (" + newX + "," + newY
-                        + ") the robot is touching at least one world boundary");
-                returnValue = false;
-            }
-        } else {
-            this.log("Can not move to position(" + newX + "," + newY + "). Not enough battery.");
-            returnValue = false;
+            } 
+        else {
+        	throw new NotEnoughBatteryExceptions(this.getBatteryLevel());
         }
-        return returnValue;
     }
 
     /**
