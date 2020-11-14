@@ -8,15 +8,22 @@ import java.util.*;
  * 
  */
 public final class UseCollection {
-
-    private UseCollection() {
-    }
     
     private static final int START_NUMBER = 1000;
 	private static final int FINAL_NUMBER = 2000;
 	private static final int ELEMS = 100_000;
 	private static final int TO_MS = 1_000_000;
 	private static final int NUM_OF_READ = 1_000_000;
+	
+	private static final long AFRICA_POPULATION = 1_110_635_000L;
+    private static final long AMERICAS_POPULATION = 972_005_000L;
+    private static final long ANTARCTICA_POPULATION = 0L;
+    private static final long ASIA_POPULATION = 4_298_723_000L;
+    private static final long EUROPE_POPULATION = 742_452_000L;
+    private static final long OCEANIA_POPULATION = 38_304_000L;
+	
+	 private UseCollection() {
+	    }
 	
     /**
      * @param s
@@ -127,19 +134,19 @@ public final class UseCollection {
          */
     	
     	final Map<String,Long> popuMap = new HashMap<>();
-    	popuMap.put("Africa", 1_110_635_000L);
-    	popuMap.put("Americas", 972_005_000L);
-    	popuMap.put("Antarctica", 0L);
-    	popuMap.put("Asia", 4_298_723_000L);
-    	popuMap.put("Europe", 742_452_000L);
-    	popuMap.put("Oceania", 38_304_000L);
+    	popuMap.put("Africa", AFRICA_POPULATION);
+    	popuMap.put("Americas", AMERICAS_POPULATION);
+    	popuMap.put("Antarctica", ANTARCTICA_POPULATION);
+    	popuMap.put("Asia", ASIA_POPULATION);
+    	popuMap.put("Europe", EUROPE_POPULATION);
+    	popuMap.put("Oceania", OCEANIA_POPULATION);
     	
         /*
          * 8) Compute the population of the world
          */
     	long total = 0;
-    	for (String i : popuMap.keySet()) {
-    		total += popuMap.get(i);
+    	for (final long i : popuMap.values()) {
+    		total += i;
     	}
     	
     	System.out.println("The population of the world is : " + total);
