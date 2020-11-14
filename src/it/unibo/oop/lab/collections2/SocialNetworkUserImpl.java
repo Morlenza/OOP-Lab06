@@ -1,10 +1,14 @@
 package it.unibo.oop.lab.collections2;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 /**
  * 
  * Instructions
@@ -31,7 +35,7 @@ public class SocialNetworkUserImpl<U extends User> extends UserImpl implements S
 	 * think of what type of keys and values would best suit the requirements
 	 */
 
-	private final Map<String, LinkedList<U>> map;
+	private final Map<String, Set<U>> map;
 
 	/*
 	 * [CONSTRUCTORS]
@@ -76,7 +80,7 @@ public class SocialNetworkUserImpl<U extends User> extends UserImpl implements S
 				this.map.get(circle).add(user);
 				return true;
 			} else {
-				this.map.put(circle, new LinkedList<U>());
+				this.map.put(circle, new HashSet<U>());
 				this.map.get(circle).add(user);
 				return true;
 			}
@@ -90,8 +94,8 @@ public class SocialNetworkUserImpl<U extends User> extends UserImpl implements S
 
 	private boolean isIncluded(U user) {
 		boolean check = false;
-		for (List<U> list : map.values()) {
-			if (list.contains(user)) {
+		for (Set<U> set : map.values()) {
+			if (set.contains(user)) {
 				check = true;
 			}
 		}
@@ -103,16 +107,16 @@ public class SocialNetworkUserImpl<U extends User> extends UserImpl implements S
 		if (this.map.containsKey(groupName)) {
 			return new LinkedList<U>(this.map.get(groupName));
 		}
-		return new LinkedList<U>();
+		return Collections.emptyList();
 	}
 
 	@Override
 	public List<U> getFollowedUsers() {
-		List<U> listUsers = new LinkedList<>();
-		for (List<U> list : map.values()) {
-			listUsers.addAll(list);
+		Set<U> listUsers = new HashSet<>();
+		for (Set<U> set : map.values()) {
+			listUsers.addAll(set);
 		}
-		return listUsers;
+		return new ArrayList<>(listUsers);
 	}
 
 }
