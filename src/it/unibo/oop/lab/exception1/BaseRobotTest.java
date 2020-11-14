@@ -45,7 +45,9 @@ public final class BaseRobotTest {
 		} catch (PositionOutOfBoundException e) {
 			e.getMessage();
 			Assert.assertNotNull(e);
-		} 
+		} catch (NotEnoughBatteryExceptions e) {
+            fail("No battery exception expected here!");
+        }
         // checking positions x=50; y=0
         assertEquals("[MOVING RIGHT ROBOT POS X]", RobotEnvironment.WORLD_X_UPPER_LIMIT, r1.getEnvironment().getCurrPosX());
         assertEquals("[MOVING RIGHT ROBOT POS Y]", 0, r1.getEnvironment().getCurrPosY());
@@ -66,6 +68,9 @@ public final class BaseRobotTest {
 			e.getMessage();
 			Assert.assertNotNull(e);
 		}
+        catch (NotEnoughBatteryExceptions e) {
+            fail("No battery exception expected here!");
+        }
         // checking positions x=50; y=80
         assertEquals("[MOVING RIGHT ROBOT POS X]", RobotEnvironment.WORLD_X_UPPER_LIMIT, r1.getEnvironment().getCurrPosX());
         assertEquals("[MOVING RIGHT ROBOT POS Y]", RobotEnvironment.WORLD_Y_UPPER_LIMIT, r1.getEnvironment().getCurrPosY());
@@ -91,7 +96,9 @@ public final class BaseRobotTest {
 			r2.moveUp();
 			
 			fail("Neanche qui non dovevi arrivare!");
-		} catch (NotEnoughBatteryExceptions e) {
+		} catch (PositionOutOfBoundException e) {
+            fail("I expected battery to fail!");
+        } catch (NotEnoughBatteryExceptions e) {
 			e.getMessage();
 			Assert.assertNotNull(e);
 		}
