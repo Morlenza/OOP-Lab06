@@ -110,7 +110,7 @@ public class StrictBankAccount implements BankAccount {
 		if (!checkUser(usrID)) {
 			throw new WrongAccountHolderException(usrID);
 		} else if (!isWithdrawAllowed(feeAmount)) {
-			throw new NotEnoughBatteryExceptions(feeAmount);
+			throw new NotEnoughFoundsException();
 		} else {
 			balance -= MANAGEMENT_FEE + totalTransactionCount * StrictBankAccount.TRANSACTION_FEE;
 			totalTransactionCount = 0;
